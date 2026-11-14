@@ -1,0 +1,176 @@
+
+import os
+from html import escape
+
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.enums import TA_CENTER
+from reportlab.lib.units import mm
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Paragraph,
+    Spacer,
+    Table,
+    TableStyle
+)
+
+
+def generate_report(audit):
+
+    # Create reports folder if it does not exist
+    os.makedirs("reports", exist_ok=True)
+
+    report_id = audit[0]
+    worker_name = escape(str(audit[1] or "Not provided"))
+    employer = escape(str(audit[2] or "Not provided"))
+
+    payment_model = str(audit[3]).replace("_", " ").title()
+
+    actual_payment = float(audit[10])
+    expected_gross = float(audit[11])
+    expected_net = float(audit[12])
+    discrepancy = float(audit[13])
+
+    bonus = float(audit[8])
+    deductions = float(audit[9])
+
+    filename = f"reports/wagewise_report_{report_id}.pdf"
+
+    document = SimpleDocTemplate(
+        filename,
+        pagesize=A4,
+        rightMargin=20 * mm,
+        leftMargin=20 * mm,
+        topMargin=20 * mm,
+        bottomMargin=20 * mm
+    )
+
+    styles = getSampleStyleSheet()
+
+    title_style = ParagraphStyle(
+        "ReportTitle",
+        parent=styles["Title"],
+        textColor=colors.HexColor("#176B55"),
+        alignment=TA_CENTER,
+        fontSize=23,
+        spaceAfter=10
+    )
+
+    subtitle_style = ParagraphStyle(
+        "Subtitle",
+        parent=styles["Normal"],
+        alignment=TA_CENTER,
+        textColor=colors.grey,
+        fontSize=10
+    )
+
+    story = []
+
+    story.append(Paragraph("WageWise AI", title_style))
+    story.append(
+        Paragraph("Worker Earnings Analysis Report", subtitle_style)
+    )
+
+    story.append(Spacer(1, 25))
+
+    story.append(
+        Paragraph("<b>Report ID:</b> #" + str(report_id), styles["Normal"])
+    )
+
+    story.append(Spacer(1, 15))
+
+    story.append(Paragraph("Worker Information", styles["Heading2"]))
+
+    worker_data = [
+        ["Worker Name", worker_name],
+        ["Employer / Platform", employer],
+        ["Payment Model", payment_model],
+        ["Report Date", escape(str(audit[15]))]
+    ]
+
+    worker_table = Table(worker_data, colWidths=[55 * mm, 105 * mm])
+
+    worker_table.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (0, -1), colors.HexColor("#E8F7F1")),
+        ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#DDE5E2")),
+        ("PADDING", (0, 0), (-1, -1), 10),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE")
+    ]))
+
+    story.append(worker_table)
+    story.append(Spacer(1, 25))
+
+    story.append(Paragraph("Earnings Breakdown", styles["Heading2"]))
+
+    earnings_data = [
+        ["Description", "Amount (INR)"],
+        ["Expected Gross Earnings", f"{expected_gross:,.2f}"],
+        ["Agreed Deductions", f"{deductions:,.2f}"],
+        ["Expected Net Earnings", f"{expected_net:,.2f}"],
+        ["Actual Payment Received", f"{actual_payment:,.2f}"]
+    ]
+
+    earnings_table = Table(
+        earnings_data,
+        colWidths=[100 * mm, 60 * mm]
+    )
+
+    earnings_table.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#176B55")),
+        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+        ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#DDE5E2")),
+        ("PADDING", (0, 0), (-1, -1), 10),
+        ("ALIGN", (1, 0), (1, -1), "RIGHT"),
+        ("BACKGROUND", (0, 3), (-1, 3), colors.HexColor("#E8F7F1"))
+    ]))
+
+    story.append(earnings_table)
+    story.append(Spacer(1, 25))
+
+    story.append(Paragraph("Analysis Result", styles["Heading2"]))
+
+    if discrepancy > 0.01:
+        status = "Potential Payment Shortfall"
+        difference_text = f"Potential shortfall: INR {discrepancy:,.2f}"
+
+    elif discrepancy < -0.01:
+        status = "Payment Above Estimate - Review Inputs"
+        difference_text = (
+            f"Payment above estimate: INR {abs(discrepancy):,.2f}"
+        )
+
+    else:
+        status = "Matches Entered Terms"
+        difference_text = "No difference based on entered terms."
+
+    story.append(Paragraph(f"<b>Status:</b> {status}", styles["Normal"]))
+    story.append(Spacer(1, 8))
+    story.append(Paragraph(difference_text, styles["Normal"]))
+
+    story.append(Spacer(1, 20))
+
+    story.append(Paragraph("Important Disclaimer", styles["Heading2"]))
+
+    disclaimer = (
+        "This report is generated from information supplied by the worker. "
+        "It is an estimate based on entered work terms and payment details. "
+        "A potential discrepancy does not prove underpayment or wrongdoing. "
+        "Verify all figures against original work records, payment statements "
+        "and agreed terms before raising a payment query."
+    )
+
+    story.append(Paragraph(disclaimer, styles["Normal"]))
+
+    story.append(Spacer(1, 25))
+
+    story.append(
+        Paragraph(
+            "Generated by WageWise AI | Earnings Transparency",
+            subtitle_style
+        )
+    )
+
+    document.build(story)
+
+    return filename

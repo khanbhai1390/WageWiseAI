@@ -1,0 +1,303 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Earnings Analysis | WageWise AI</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+:root{--navy:#101d35;--green:#16a477;--green-dark:#10835e;--bg:#f4f7fb;--text:#18243a;--muted:#78869a;--border:#e5ebf2}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font-family:'DM Sans',Arial,sans-serif;color:var(--text)}
+a{text-decoration:none;color:inherit}
+.sidebar{width:245px;position:fixed;inset:0 auto 0 0;background:var(--navy);color:white;padding:27px 17px}
+.brand{display:flex;align-items:center;gap:11px;padding:0 8px 35px}
+.brand-icon{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#20c997,#087f63);display:grid;place-items:center;font-size:22px;font-weight:800}
+.brand-name{font-size:18px;font-weight:800}
+.brand-caption{font-size:9px;color:#94a6bd;letter-spacing:1.4px;margin-top:4px}
+.nav-heading{font-size:10px;color:#8292aa;letter-spacing:1.5px;font-weight:800;padding:10px 12px}
+.nav-link{display:flex;gap:13px;align-items:center;padding:13px 14px;border-radius:9px;margin-bottom:5px;color:#bdc9d9;font-size:13px;font-weight:600}
+.nav-link:hover,.nav-link.active{background:#243955;color:white}
+.nav-link.active{border-left:3px solid #2bd5a1}
+.nav-icon{font-size:18px;width:20px;text-align:center}
+.main{margin-left:245px}
+.topbar{height:72px;background:white;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 38px}
+.breadcrumb{font-size:12px;color:var(--muted)}
+.breadcrumb strong{color:var(--text)}
+.top-status{background:#e8f8f1;color:#13845f;border-radius:30px;padding:8px 12px;font-size:11px;font-weight:700}
+.content{max-width:1150px;margin:auto;padding:34px 38px 55px}
+.eyebrow{font-size:10px;color:var(--green-dark);font-weight:800;letter-spacing:1.6px}
+.page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:15px;margin-bottom:25px}
+h1{font-size:29px;letter-spacing:-.7px;margin:8px 0}
+.subtitle{font-size:13px;color:var(--muted);margin:0;line-height:1.7}
+.audit-id{background:white;border:1px solid var(--border);border-radius:10px;padding:11px 15px;font-size:11px;color:var(--muted);white-space:nowrap}
+.audit-id strong{color:var(--text)}
+.status-panel{background:white;border:1px solid var(--border);border-radius:15px;padding:23px 25px;display:flex;justify-content:space-between;align-items:center;gap:18px;margin-bottom:19px}
+.status-left{display:flex;align-items:center;gap:15px}
+.status-icon{width:48px;height:48px;border-radius:13px;background:#fff3df;display:grid;place-items:center;font-size:23px}
+.status-panel h2{font-size:16px;margin:0 0 5px}
+.status-panel p{font-size:11px;color:var(--muted);margin:0}
+.status-tag{font-size:11px;font-weight:800;padding:9px 13px;border-radius:30px;background:#fff3df;color:#a36b12}
+.status-tag.match{background:#e8f8f1;color:#10835e}
+.status-tag.above{background:#edf2ff;color:#5269a7}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-bottom:19px}
+.metric{background:white;border:1px solid var(--border);border-radius:14px;padding:20px}
+.metric-label{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.8px}
+.metric-value{font-size:25px;font-weight:800;margin:10px 0 5px;letter-spacing:-.5px}
+.metric-note{font-size:10px;color:var(--muted)}
+.metric.highlight{background:#10213c;color:white;border-color:#10213c}
+.metric.highlight .metric-label,.metric.highlight .metric-note{color:#b9c8da}
+.metric.highlight .metric-value{color:#69e0b8}
+.columns{display:grid;grid-template-columns:1.1fr .9fr;gap:17px}
+.panel{background:white;border:1px solid var(--border);border-radius:15px;padding:23px;margin-bottom:17px}
+.panel h3{font-size:14px;margin:0 0 6px}
+.panel-sub{font-size:11px;color:var(--muted);margin:0 0 19px}
+.breakdown-row{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid #edf1f5;font-size:12px}
+.breakdown-row:last-child{border:0}
+.breakdown-row span{color:#627187}
+.breakdown-row strong{font-size:12px}
+.breakdown-row.total{padding-top:17px;font-weight:800}
+.breakdown-row.total span,.breakdown-row.total strong{color:var(--text);font-size:13px}
+.worker-info{display:grid;grid-template-columns:1fr 1fr;gap:17px}
+.info-label{font-size:10px;color:var(--muted);margin-bottom:5px}
+.info-value{font-size:12px;font-weight:700;overflow-wrap:anywhere}
+.analysis-box{border-radius:11px;padding:16px;background:#fff8eb;border:1px solid #f3e6c7;color:#765a2d;font-size:11px;line-height:1.7}
+.analysis-box.match{background:#eaf8f1;border-color:#cceee0;color:#17694f}
+.analysis-box.above{background:#f0f3ff;border-color:#dce3ff;color:#495d91}
+.analysis-box strong{display:block;font-size:12px;margin-bottom:5px}
+.message-box{width:100%;min-height:160px;resize:vertical;border:1px solid var(--border);border-radius:10px;padding:14px;font:12px/1.8 'DM Sans',Arial,sans-serif;color:#39485d;background:#fafbfd;outline:none}
+.copy-btn{border:0;background:#16a477;color:white;border-radius:8px;padding:11px 15px;font:700 11px 'DM Sans',Arial,sans-serif;cursor:pointer;margin-top:12px}
+.copy-btn:hover{background:#10835e}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 17px;border-radius:9px;font:700 11px 'DM Sans',Arial,sans-serif;border:0;cursor:pointer}
+.btn-primary{background:#16a477;color:white}
+.btn-primary:hover{background:#10835e}
+.btn-light{background:#eaf0f6;color:#40516a}
+.disclaimer{margin-top:18px;padding:14px 17px;background:#fff9eb;border:1px solid #f3e6c7;border-radius:10px;color:#78613b;font-size:10px;line-height:1.7}
+.footer{text-align:center;color:#95a1b1;font-size:10px;padding:25px 0 0}
+@media(max-width:900px){.columns{grid-template-columns:1fr}.metrics{grid-template-columns:1fr 1fr}}
+@media(max-width:760px){.sidebar{width:65px;padding:20px 7px}.brand{justify-content:center;padding:0 0 30px}.brand-copy,.nav-heading,.nav-text{display:none}.nav-link{justify-content:center;padding:14px 4px}.main{margin-left:65px}.topbar{padding:0 15px}.content{padding:23px 14px}.page-head{align-items:flex-start;flex-direction:column}.status-panel{align-items:flex-start;flex-direction:column}.metrics{grid-template-columns:1fr}.panel{padding:18px}}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <div class="brand">
+        <div class="brand-icon">W</div>
+        <div class="brand-copy">
+            <div class="brand-name">WageWise AI</div>
+            <div class="brand-caption">EARNINGS TRANSPARENCY</div>
+        </div>
+    </div>
+    <div class="nav-heading">WORKSPACE</div>
+    <a href="/" class="nav-link"><span class="nav-icon">▦</span><span class="nav-text">Overview</span></a>
+    <a href="/new-audit" class="nav-link"><span class="nav-icon">＋</span><span class="nav-text">New earnings check</span></a>
+    <a href="/dashboard" class="nav-link"><span class="nav-icon">▤</span><span class="nav-text">Audit history</span></a>
+</aside>
+
+<main class="main">
+<header class="topbar">
+    <div class="breadcrumb">Workspace / Earnings analysis</div>
+    <span class="top-status">● Analysis complete</span>
+</header>
+
+<div class="content">
+    <div class="page-head">
+        <div>
+            <div class="eyebrow">EARNINGS TRANSPARENCY REPORT</div>
+            <h1>Payment analysis</h1>
+            <p class="subtitle">Review your expected earnings and compare them with the payment received.</p>
+        </div>
+        <div class="audit-id">AUDIT REFERENCE &nbsp;<strong>#{{ audit[0] }}</strong></div>
+    </div>
+
+    <section class="status-panel">
+        <div class="status-left">
+            <div class="status-icon">
+                {% if audit[13] > 0.01 %}⚠️{% elif audit[13] < -0.01 %}↗️{% else %}✓{% endif %}
+            </div>
+            <div>
+                <h2>
+                    {% if audit[13] > 0.01 %}
+                        Potential payment shortfall
+                    {% elif audit[13] < -0.01 %}
+                        Payment above estimate
+                    {% else %}
+                        Entered figures match
+                    {% endif %}
+                </h2>
+                <p>Based on the work details, rates and payment information entered.</p>
+            </div>
+        </div>
+        <span class="status-tag {% if audit[13] >= -0.01 and audit[13] <= 0.01 %}match{% elif audit[13] < -0.01 %}above{% endif %}">
+            {{ audit[14] }}
+        </span>
+    </section>
+
+    <section class="metrics">
+        <div class="metric">
+            <div class="metric-label">Expected net earnings</div>
+            <div class="metric-value">₹{{ "%.2f"|format(audit[12]) }}</div>
+            <div class="metric-note">After agreed deductions</div>
+        </div>
+        <div class="metric">
+            <div class="metric-label">Actual payment received</div>
+            <div class="metric-value">₹{{ "%.2f"|format(audit[10]) }}</div>
+            <div class="metric-note">Amount entered as received</div>
+        </div>
+        <div class="metric highlight">
+            <div class="metric-label">Difference</div>
+            <div class="metric-value">₹{{ "%.2f"|format(audit[13]|abs) }}</div>
+            <div class="metric-note">
+                {% if audit[13] > 0.01 %}Potential shortfall{% elif audit[13] < -0.01 %}Payment above estimate{% else %}No difference in entered figures{% endif %}
+            </div>
+        </div>
+    </section>
+
+    <div class="columns">
+        <div>
+            <section class="panel">
+                <h3>Earnings breakdown</h3>
+                <p class="panel-sub">How your expected payment was calculated.</p>
+                <div class="breakdown-row">
+                    <span>Base earnings</span>
+                    <strong>₹{{ "%.2f"|format(audit[11] - audit[8]) }}</strong>
+                </div>
+                <div class="breakdown-row">
+                    <span>Expected bonus</span>
+                    <strong>+ ₹{{ "%.2f"|format(audit[8]) }}</strong>
+                </div>
+                <div class="breakdown-row">
+                    <span>Expected gross earnings</span>
+                    <strong>₹{{ "%.2f"|format(audit[11]) }}</strong>
+                </div>
+                <div class="breakdown-row">
+                    <span>Agreed deductions</span>
+                    <strong>− ₹{{ "%.2f"|format(audit[9]) }}</strong>
+                </div>
+                <div class="breakdown-row total">
+                    <span>Expected net earnings</span>
+                    <strong>₹{{ "%.2f"|format(audit[12]) }}</strong>
+                </div>
+            </section>
+
+            <section class="panel">
+                <h3>Worker and payment details</h3>
+                <p class="panel-sub">Information supplied for this earnings review.</p>
+                <div class="worker-info">
+                    <div>
+                        <div class="info-label">Worker name</div>
+                        <div class="info-value">{{ audit[1] }}</div>
+                    </div>
+                    <div>
+                        <div class="info-label">Employer / Platform</div>
+                        <div class="info-value">{{ audit[2] }}</div>
+                    </div>
+                    <div>
+                        <div class="info-label">Payment model</div>
+                        <div class="info-value">{{ "Hourly payment" if audit[3] == "hourly" else "Per-delivery payment" }}</div>
+                    </div>
+                    <div>
+                        <div class="info-label">Review date</div>
+                        <div class="info-value">{{ audit[15] }}</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div>
+            <section class="panel">
+                <h3>WageWise analysis</h3>
+                <p class="panel-sub">Interpretation of the entered payment figures.</p>
+                <div class="analysis-box {% if audit[13] >= -0.01 and audit[13] <= 0.01 %}match{% elif audit[13] < -0.01 %}above{% endif %}">
+                    {% if audit[13] > 0.01 %}
+                        <strong>Potential difference identified</strong>
+                        Your entered figures show that the expected net earnings are ₹{{ "%.2f"|format(audit[12]) }}, while the actual payment entered is ₹{{ "%.2f"|format(audit[10]) }}. This is a potential shortfall of ₹{{ "%.2f"|format(audit[13]) }}. Review your work records, agreed terms and payment statement.
+                    {% elif audit[13] < -0.01 %}
+                        <strong>Payment is above the estimate</strong>
+                        The actual payment entered is ₹{{ "%.2f"|format(audit[10]) }}, which is ₹{{ "%.2f"|format(audit[13]|abs) }} above the estimated net earnings. Check whether additional incentives, adjustments or other payments apply.
+                    {% else %}
+                        <strong>No difference identified</strong>
+                        The actual payment entered matches the expected net earnings based on the information supplied.
+                    {% endif %}
+                </div>
+            </section>
+
+            {% if audit[13]|abs > 0.01 %}
+            <section class="panel">
+                <h3>Payment clarification message</h3>
+                <p class="panel-sub">A polite message you can review and send to your employer.</p>
+                <textarea class="message-box" id="clarificationMessage" readonly>Dear {{ audit[2] }},
+
+I would like to request a clarification regarding my recent payment.
+
+Based on my work details and agreed payment terms, my estimated net earnings are ₹{{ "%.2f"|format(audit[12]) }}. The actual payment I received was ₹{{ "%.2f"|format(audit[10]) }}.
+
+The difference between these amounts is ₹{{ "%.2f"|format(audit[13]|abs) }}.
+
+Could you please review the payment and share an itemized breakdown of the calculation, including any applicable bonuses or deductions?
+
+Thank you for your assistance.
+
+Regards,
+{{ audit[1] }}</textarea>
+                <button class="copy-btn" type="button" onclick="copyMessage()">▣ &nbsp; Copy clarification message</button>
+            </section>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="actions">
+        <a href="/new-audit" class="btn btn-primary">＋ New earnings check</a>
+        <a href="/dashboard" class="btn btn-light">View audit history</a>
+        <a href="/download-report/{{ audit[0] }}" class="btn btn-light">↓ Download PDF report</a>
+    </div>
+
+    <div class="disclaimer">
+        <strong>Important notice:</strong> This report is an estimate based only on the information entered.
+        A potential payment difference is not proof of wrongdoing. Verify your work records, agreed terms,
+        bonus eligibility and payment statement before raising a concern.
+    </div>
+
+    <footer class="footer">WageWise AI · Earnings Transparency Assistant · Prototype</footer>
+</div>
+</main>
+
+<script>
+function copyMessage() {
+    const message = document.getElementById("clarificationMessage");
+    if (!message) return;
+    message.select();
+    message.setSelectionRange(0, 99999);
+
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(message.value).then(() => {
+            showCopySuccess();
+        }).catch(() => {
+            fallbackCopy(message);
+        });
+    } else {
+        fallbackCopy(message);
+    }
+}
+function fallbackCopy(message) {
+    try {
+        document.execCommand("copy");
+        showCopySuccess();
+    } catch (error) {
+        alert("Please select and copy the message manually.");
+    }
+}
+function showCopySuccess() {
+    const button = document.querySelector(".copy-btn");
+    if (button) {
+        button.textContent = "✓ Copied successfully";
+        setTimeout(() => {
+            button.textContent = "▣  Copy clarification message";
+        }, 2000);
+    }
+}
+</script>
+</body>
+</html>
